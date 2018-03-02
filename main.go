@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/c-bata/go-prompt"
-	"github.com/c-bata/kube-prompt/kube"
+	"github.com/stormbeta/kube-prompt/kube"
 )
 
 var (
