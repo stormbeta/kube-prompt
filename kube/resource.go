@@ -11,6 +11,7 @@ import (
 
 	"github.com/c-bata/go-prompt"
 	"k8s.io/api/core/v1"
+	rbac_v1 "k8s.io/api/rbac/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apps_v1 "k8s.io/api/apps/v1"
 	ext_v1beta1 "k8s.io/api/extensions/v1beta1"
@@ -19,6 +20,7 @@ import (
 const thresholdFetchInterval = 10 * time.Second
 
 var resourceTypes = []prompt.Suggest{
+	{Text: "clusterroles"},
 	{Text: "clusters"}, // valid only for federation apiservers
 	{Text: "componentstatuses"},
 	{Text: "configmaps"},
@@ -41,6 +43,7 @@ var resourceTypes = []prompt.Suggest{
 	{Text: "replicasets"},
 	{Text: "replicationcontrollers"},
 	{Text: "resourcequotas"},
+	{Text: "roles"},
 	{Text: "secrets"},
 	{Text: "serviceaccounts"},
 	{Text: "services"},
@@ -85,6 +88,7 @@ func init() {
 	replicaSetList = new(sync.Map)
 	replicationControllerList = new(sync.Map)
 	resourceQuotaList = new(sync.Map)
+	rolesList = new(sync.Map)
 	serviceAccountList = new(sync.Map)
 	serviceList = new(sync.Map)
 }
@@ -110,6 +114,37 @@ func shouldFetch(key string) bool {
 
 func updateLastFetchedAt(key string) {
 	lastFetchedAt.Store(key, time.Now())
+}
+
+/* Cluster Role */
+
+var (
+	clusterRoleList atomic.Value
+)
+
+func fetchClusterRoleList() {
+	key := "cluster_role"
+	if !shouldFetch(key) {
+		return
+	}
+	l, _ := getClient().RbacV1().ClusterRoles().List(meta_v1.ListOptions{})
+	clusterRoleList.Store(l)
+	updateLastFetchedAt(key)
+}
+
+func getClusterRoleSuggestions() []prompt.Suggest {
+	go fetchClusterRoleList()
+	l, ok := clusterRoleList.Load().(*rbac_v1.ClusterRoleList)
+	if !ok || len(l.Items) == 0 {
+		return []prompt.Suggest{}
+	}
+	s := make([]prompt.Suggest, len(l.Items))
+	for i := range l.Items {
+		s[i] = prompt.Suggest{
+			Text: l.Items[i].Name,
+		}
+	}
+	return s
 }
 
 /* Component Status */
@@ -884,6 +919,45 @@ func getResourceQuotasSuggestions() []prompt.Suggest {
 	}
 	return s
 }
+
+/* Roles */
+
+var (
+	rolesList *sync.Map
+)
+
+func fetchRolesList(namespace string) {
+	key := "roles" + namespace
+	if !shouldFetch(key) {
+		return
+	}
+	updateLastFetchedAt(key)
+
+	l, _ := getClient().RbacV1().Roles(namespace).List(meta_v1.ListOptions{})
+	resourceQuotaList.Store(namespace, l)
+	return
+}
+
+func getRolesSuggestions() []prompt.Suggest {
+	namespace := v1.NamespaceAll
+	go fetchRolesList(namespace)
+	x, ok := rolesList.Load(namespace)
+	if !ok {
+		return []prompt.Suggest{}
+	}
+	l, ok := x.(*v1.ResourceQuotaList)
+	if !ok || len(l.Items) == 0 {
+		return []prompt.Suggest{}
+	}
+	s := make([]prompt.Suggest, len(l.Items))
+	for i := range l.Items {
+		s[i] = prompt.Suggest{
+			Text: l.Items[i].Name,
+		}
+	}
+	return s
+}
+
 
 /* Service Account */
 

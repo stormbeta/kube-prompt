@@ -39,6 +39,8 @@ func completeOptionArguments(d prompt.Document) ([]prompt.Suggest, bool) {
 			return fileCompleter(d), true
 		case "--namespace":
 			return getNameSpaceSuggestions(), true
+		case "--as":
+			return getServiceAccountSuggestions(), true
 		}
 	}
 	return []prompt.Suggest{}, false

@@ -81,6 +81,7 @@ func argumentsCompleter(args []string) []prompt.Suggest {
 		second := args[1]
 		if len(args) == 2 {
 			subcommands := []prompt.Suggest{
+				{Text: "clusterroles"},
 				{Text: "componentstatuses"},
 				{Text: "configmaps"},
 				{Text: "daemonsets"},
@@ -102,6 +103,7 @@ func argumentsCompleter(args []string) []prompt.Suggest {
 				{Text: "replicasets"},
 				{Text: "replicationcontrollers"},
 				{Text: "resourcequotas"},
+				{Text: "roles"},
 				{Text: "secrets"},
 				{Text: "serviceaccounts"},
 				{Text: "services"},
@@ -135,6 +137,8 @@ func argumentsCompleter(args []string) []prompt.Suggest {
 		third := args[2]
 		if len(args) == 3 {
 			switch second {
+			case "clusterroles", "clusterrole":
+				return prompt.FilterContains(getClusterRoleSuggestions(), third, true)
 			case "componentstatuses", "cs":
 				return prompt.FilterContains(getComponentStatusCompletions(), third, true)
 			case "configmaps", "cm":
@@ -169,6 +173,8 @@ func argumentsCompleter(args []string) []prompt.Suggest {
 				return prompt.FilterContains(getReplicationControllerSuggestions(), third, true)
 			case "resourcequotas", "quota":
 				return prompt.FilterContains(getResourceQuotasSuggestions(), third, true)
+			case "roles":
+				return prompt.FilterContains(getRolesSuggestions(), third, true)
 			case "secrets":
 				return prompt.FilterContains(getSecretSuggestions(), third, true)
 			case "sa", "serviceaccounts":
@@ -186,6 +192,8 @@ func argumentsCompleter(args []string) []prompt.Suggest {
 		third := args[2]
 		if len(args) == 3 {
 			switch second {
+			case "clusterroles":
+				return prompt.FilterContains(getClusterRoleSuggestions(), third, true)
 			case "componentstatuses", "cs":
 				return prompt.FilterContains(getComponentStatusCompletions(), third, true)
 			case "configmaps", "cm":
@@ -220,6 +228,8 @@ func argumentsCompleter(args []string) []prompt.Suggest {
 				return prompt.FilterContains(getReplicationControllerSuggestions(), third, true)
 			case "resourcequotas", "quota":
 				return prompt.FilterContains(getResourceQuotasSuggestions(), third, true)
+			case "roles":
+				return prompt.FilterContains(getRolesSuggestions(), third, true)
 			case "secrets":
 				return prompt.FilterContains(getSecretSuggestions(), third, true)
 			case "sa", "serviceaccounts":
@@ -250,6 +260,8 @@ func argumentsCompleter(args []string) []prompt.Suggest {
 		third := args[2]
 		if len(args) == 3 {
 			switch second {
+			case "clusterroles":
+				return prompt.FilterContains(getClusterRoleSuggestions(), third, true)
 			case "componentstatuses", "cs":
 				return prompt.FilterContains(getComponentStatusCompletions(), third, true)
 			case "configmaps", "cm":
@@ -284,6 +296,8 @@ func argumentsCompleter(args []string) []prompt.Suggest {
 				return prompt.FilterContains(getReplicationControllerSuggestions(), third, true)
 			case "resourcequotas", "quota":
 				return prompt.FilterContains(getResourceQuotasSuggestions(), third, true)
+			case "roles":
+				return prompt.FilterContains(getRolesSuggestions(), third, true)
 			case "secrets":
 				return prompt.FilterContains(getSecretSuggestions(), third, true)
 			case "sa", "serviceaccounts":
@@ -300,6 +314,8 @@ func argumentsCompleter(args []string) []prompt.Suggest {
 		if len(args) == 3 {
 			third := args[2]
 			switch args[1] {
+			case "clusterroles":
+				return prompt.FilterContains(getClusterRoleSuggestions(), third, true)
 			case "componentstatuses", "cs":
 				return prompt.FilterContains(getComponentStatusCompletions(), third, true)
 			case "configmaps", "cm":
@@ -334,6 +350,8 @@ func argumentsCompleter(args []string) []prompt.Suggest {
 				return prompt.FilterContains(getReplicationControllerSuggestions(), third, true)
 			case "resourcequotas", "quota":
 				return prompt.FilterContains(getResourceQuotasSuggestions(), third, true)
+			case "roles":
+				return prompt.FilterContains(getRolesSuggestions(), third, true)
 			case "secrets":
 				return prompt.FilterContains(getSecretSuggestions(), third, true)
 			case "sa", "serviceaccounts":
